@@ -23,6 +23,11 @@ class PlayScene extends Phaser.Scene {
     this.player = this.physics.add
       .sprite(0, this.gameHeight, 'dino-idle')
       .setOrigin(0, 1)
+
+    this.player
+      .setGravityY(5000)
+      .setCollideWorldBounds(true) //ชนขอบจอ
+      .setBodySize(44, 92) //fix hit-box dino
   }
 
   createEnvironment() {
