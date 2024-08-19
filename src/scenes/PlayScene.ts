@@ -52,6 +52,10 @@ class PlayScene extends Phaser.Scene {
       .tileSprite(0, this.gameHeight as number, 88, 26, 'ground')
       .setOrigin(0, 1)
   }
+
+  update(time: number, delta: number): void {
+    this.player.update()
+  }
 }
 
 export default PlayScene
