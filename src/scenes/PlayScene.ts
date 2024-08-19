@@ -26,15 +26,13 @@ class PlayScene extends Phaser.Scene {
       .setAlpha(0)
       .setOrigin(0, 1)
 
-    this.registerPlayerControl()
-
     this.physics.add.overlap(this.startTrigger, this.player, () => {
       console.log('COLISION!')
     })
   }
 
   createPlayer() {
-    // // add Dino by create sprite object
+    // add Dino by create sprite object
     // this.player = this.physics.add
     //   .sprite(0, this.gameHeight, 'dino-idle')
     //   .setOrigin(0, 1)
@@ -44,7 +42,7 @@ class PlayScene extends Phaser.Scene {
     //   .setCollideWorldBounds(true) //ชนขอบจอ
     //   .setBodySize(44, 92) //fix hit-box dino
 
-    //ย้าย setting ต่างๆ ไปที่ class
+    //ย้าย setting ต่างๆ ไปที่ class Player
     this.player = new Player(this, 0, this.gameHeight)
   }
 
@@ -53,17 +51,6 @@ class PlayScene extends Phaser.Scene {
     this.add
       .tileSprite(0, this.gameHeight as number, 88, 26, 'ground')
       .setOrigin(0, 1)
-  }
-
-  registerPlayerControl() {
-    // ถ้ากด spacebar ให้ dino กระโดด
-    const spaceBar = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.SPACE
-    )
-
-    spaceBar.on('down', () => {
-      this.player.setVelocityY(-1600)
-    })
   }
 }
 
