@@ -1,8 +1,10 @@
 import Phaser from 'phaser'
+import { Player } from '../entities/Player'
 import { SpriteWithDynamicBody } from '../types'
 
 class PlayScene extends Phaser.Scene {
-  player: SpriteWithDynamicBody
+  // player: SpriteWithDynamicBody เปลี่ยน Type เป็น Player
+  player: Player
   startTrigger: SpriteWithDynamicBody
 
   // get ค่าความสูงของเกม
@@ -32,15 +34,18 @@ class PlayScene extends Phaser.Scene {
   }
 
   createPlayer() {
-    // add Dino by create sprite object
-    this.player = this.physics.add
-      .sprite(0, this.gameHeight, 'dino-idle')
-      .setOrigin(0, 1)
+    // // add Dino by create sprite object
+    // this.player = this.physics.add
+    //   .sprite(0, this.gameHeight, 'dino-idle')
+    //   .setOrigin(0, 1)
 
-    this.player
-      .setGravityY(5000)
-      .setCollideWorldBounds(true) //ชนขอบจอ
-      .setBodySize(44, 92) //fix hit-box dino
+    // this.player
+    //   .setGravityY(5000)
+    //   .setCollideWorldBounds(true) //ชนขอบจอ
+    //   .setBodySize(44, 92) //fix hit-box dino
+
+    //ย้าย setting ต่างๆ ไปที่ class
+    this.player = new Player(this, 0, this.gameHeight)
   }
 
   createEnvironment() {
