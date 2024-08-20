@@ -8,17 +8,8 @@ class PlayScene extends GameScene {
   player: Player
   ground: Phaser.GameObjects.TileSprite
   startTrigger: SpriteWithDynamicBody
-  // isGameRunning: boolean = false
-
-  // // get ค่าความสูงของเกม
-  // get gameHeight() {
-  //   return this.game.config.height as number
-  // }
-
-  // // get ค่าความกว้างของเกม
-  // get gameWidth() {
-  //   return this.game.config.width as number
-  // }
+  spawnInterval: number = 1500
+  spawnTime: number = 0
 
   constructor() {
     super('PlayScene')
@@ -91,7 +82,14 @@ class PlayScene extends GameScene {
       .setOrigin(0, 1)
   }
 
-  update(time: number, delta: number): void {}
+  update(time: number, delta: number): void {
+    this.spawnTime += delta
+
+    if (this.spawnTime >= this.spawnInterval) {
+      console.log('Spawning obstacle!')
+      this.spawnTime = 0
+    }
+  }
 }
 
 export default PlayScene
