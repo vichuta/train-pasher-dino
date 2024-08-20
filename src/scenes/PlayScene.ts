@@ -4,9 +4,11 @@ import { SpriteWithDynamicBody } from '../types'
 import { GameScene } from './GameScene'
 
 class PlayScene extends GameScene {
+  // --- กำหนด Type ตัวแปร ---
   // player: SpriteWithDynamicBody เปลี่ยน Type เป็น Player
   player: Player
   ground: Phaser.GameObjects.TileSprite
+  obstacles: Phaser.Physics.Arcade.Group
   startTrigger: SpriteWithDynamicBody
   spawnInterval: number = 1500
   spawnTime: number = 0
@@ -57,6 +59,8 @@ class PlayScene extends GameScene {
           }
         }
       })
+
+      this.obstacles = this.physics.add.group()
     })
   }
 
@@ -86,9 +90,18 @@ class PlayScene extends GameScene {
     this.spawnTime += delta
 
     if (this.spawnTime >= this.spawnInterval) {
-      console.log('Spawning obstacle!')
+      this.spawnObstacle()
       this.spawnTime = 0
     }
+  }
+
+  spawnObstacle() {
+    const obstacleNum = Math.floor(Math.random() * 6) + 1
+    const distance = Phaser.Math.Between(600, 900)
+
+    this.obstacles
+      .create(distance, this.gameHeight, `obstacle-${obstacleNum}`)
+      .setOrigin(0, 1)
   }
 }
 
