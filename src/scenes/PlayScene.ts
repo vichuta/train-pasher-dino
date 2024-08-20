@@ -31,10 +31,18 @@ class PlayScene extends GameScene {
 
     this.obstacles = this.physics.add.group()
 
-    // ตรวจสถานะการชนอของ obstacle กับ Dino --> ถ้าชนให้หยุดเกม
+    // ตรวจสถานะการชนของ obstacle กับ Dino
     this.physics.add.collider(this.obstacles, this.player, () => {
-      this.physics.pause()
+      // --> ถ้าชนให้หยุดเกม
       this.isGameRunning = false
+      this.physics.pause()
+
+      // --> เปลี่ยนรูป Dino เป็นท่าตาย
+      this.player.die()
+
+      // --> reset ค่า
+      this.spawnTime = 0
+      this.gameSpeed = 5
     })
 
     // ถ้า object startTrigger ทับกับ Dino ให้ทำ function ต่อไปนี้

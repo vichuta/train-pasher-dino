@@ -77,4 +77,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       repeat: -1
     })
   }
+
+  die() {
+    this.anims.pause() //หยุดย่ำท้า
+    this.setTexture('dino-hurt') // เปลี่ยนเป็นรูป Dino ท่าตาย
+  }
 }
