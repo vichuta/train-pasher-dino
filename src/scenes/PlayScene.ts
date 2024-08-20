@@ -30,6 +30,13 @@ class PlayScene extends GameScene {
       .setOrigin(0, 1)
 
     this.obstacles = this.physics.add.group()
+
+    // ตรวจสถานะการชนอของ obstacle กับ Dino --> ถ้าชนให้หยุดเกม
+    this.physics.add.collider(this.obstacles, this.player, () => {
+      this.physics.pause()
+      this.isGameRunning = false
+    })
+
     // ถ้า object startTrigger ทับกับ Dino ให้ทำ function ต่อไปนี้
     this.physics.add.overlap(this.startTrigger, this.player, () => {
       // ถ้าตำแหน่ง y ของ startTrigger = 10 --> ให้ ย้ายไปอยู่ขอบซ้ายล่าง .body.reset(0,y)
@@ -123,6 +130,7 @@ class PlayScene extends GameScene {
     this.obstacles
       .create(distance, this.gameHeight, `obstacle-${obstacleNum}`)
       .setOrigin(0, 1)
+      .setImmovable()
   }
 }
 
