@@ -33,6 +33,8 @@ class PlayScene extends GameScene {
     this.handleGameStart()
     this.handleObstacleCollisions()
     this.handleGameRestart()
+
+    this.createAnimations()
   }
 
   createPlayer() {
@@ -89,11 +91,21 @@ class PlayScene extends GameScene {
       .setAlpha(0)
   }
 
+  createAnimations() {
+    this.anims.create({
+      key: 'enemy-bird-fly',
+      frames: this.anims.generateFrameNumbers('enemy-bird'),
+      frameRate: 6,
+      repeat: -1
+    })
+  }
+
   spawnObstacle() {
     // สุ่มตัวเอง 1-7 (ใส่ค่า default ไว้ที่ index.ts)
     const obstaclesCount =
       PRELOAD_CONFIG.cactusesCount + PRELOAD_CONFIG.birdsCount
-    const obstacleNum = Math.floor(Math.random() * obstaclesCount) + 1
+    // const obstacleNum = Math.floor(Math.random() * obstaclesCount) + 1
+    const obstacleNum = 7 // สำหรับ test  enemy-bird
 
     // สุ่มค่า x ระยะห่างในการ spawn obstacle
     const distance = Phaser.Math.Between(600, 900)
@@ -109,6 +121,8 @@ class PlayScene extends GameScene {
         .create(distance, this.gameHeight - enemyHeight, 'enemy-bird')
         .setOrigin(0, 1)
         .setImmovable()
+
+      obstacle.play('enemy-bird-fly', true)
     } else {
       // obstacle (กระบองเพชร)
       obstacle = this.obstacles
@@ -164,6 +178,7 @@ class PlayScene extends GameScene {
       // --> ถ้าชนให้หยุดเกม
       this.isGameRunning = false
       this.physics.pause()
+      this.anims.pauseAll() //หยุด animation ของ bird
 
       // --> เปลี่ยนรูป Dino เป็นท่าตาย
       this.player.die()
