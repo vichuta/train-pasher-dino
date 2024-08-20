@@ -33,10 +33,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // }
   update() {
     const { space } = this.cursors
-    console.log(space.isDown)
+    const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space)
 
     //ถ้าปุ่ม spacebar ถูกกดอยู่ / กด spacebar ค้าง = โดดดดดดดดดดดดดดดดด ลอยเลย
-    if (space.isDown) {
+    if (isSpaceJustDown) {
       this.setVelocityY(-1600)
     }
   }
