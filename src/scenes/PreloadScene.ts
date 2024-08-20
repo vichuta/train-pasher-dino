@@ -16,6 +16,11 @@ class PreloadScene extends Phaser.Scene {
       frameHeight: 94
     })
 
+    this.load.spritesheet('dino-down', 'assets/dino-down-2.png', {
+      frameWidth: 118,
+      frameHeight: 94
+    })
+
     this.load.image('game-over', 'assets/game-over.png')
     this.load.image('restart', 'assets/restart.png')
 
