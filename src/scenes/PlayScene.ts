@@ -13,7 +13,7 @@ class PlayScene extends GameScene {
   startTrigger: SpriteWithDynamicBody
   spawnInterval: number = 1500
   spawnTime: number = 0
-  obstacleSpeed: number = 10
+  gameSpeed: number = 5
 
   constructor() {
     super('PlayScene')
@@ -102,7 +102,17 @@ class PlayScene extends GameScene {
     }
 
     // เพิ่ม action ในเพิ่ม/ลดการเคลื่อนที่ในแนวแกน x
-    Phaser.Actions.IncX(this.obstacles.getChildren(), -this.obstacleSpeed)
+    Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
+
+    // ถ้า obstacle ไหนวิ่งเลยจน x ติดลบ (วิ่งเลยขอบ) แล้ว --> ลบ objeect ทิ้ง
+    this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody) => {
+      if (obstacle.getBounds().right < 0) {
+        this.obstacles.remove(obstacle)
+      }
+    })
+
+    // ทำให้พื้นวิ่งตาม obstacle (ใช้ความเร็วแกน x เท่ากัน)
+    this.ground.tilePositionX += this.gameSpeed
   }
 
   spawnObstacle() {
