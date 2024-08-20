@@ -2,10 +2,10 @@ import { GameScene } from '../scenes/GameScene'
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys // CursorKeys เป็น type Object ที่เก็บ keyborad ขึ้น-ลง-ซ้าย-ขวา-spacebar
-    super(scene, x, y, 'dino-idle')
   scene: GameScene
 
   constructor(scene: GameScene, x: number, y: number) {
+    super(scene, x, y, 'dino-run')
 
     scene.add.existing(this)
     scene.physics.add.existing(this)
