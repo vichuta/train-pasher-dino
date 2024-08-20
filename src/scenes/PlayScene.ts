@@ -28,6 +28,7 @@ class PlayScene extends GameScene {
       .setAlpha(0)
       .setOrigin(0, 1)
 
+    this.obstacles = this.physics.add.group()
     // ถ้า object startTrigger ทับกับ Dino ให้ทำ function ต่อไปนี้
     this.physics.add.overlap(this.startTrigger, this.player, () => {
       // ถ้าตำแหน่ง y ของ startTrigger = 10 --> ให้ ย้ายไปอยู่ขอบซ้ายล่าง .body.reset(0,y)
@@ -60,8 +61,6 @@ class PlayScene extends GameScene {
           }
         }
       })
-
-      this.obstacles = this.physics.add.group()
     })
   }
 
