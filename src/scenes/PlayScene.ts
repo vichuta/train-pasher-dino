@@ -49,14 +49,17 @@ class PlayScene extends Phaser.Scene {
         delay: 1000 / 60,
         loop: true,
         callback: () => {
+          console.log('rolling')
+          this.player.playRunAnimation()
           this.player.setVelocityX(80) // ทำให้ Dino เคลื่อนไปข้าวหน้านิดนึง
           this.ground.width += 17 * 2 // ทำให้ ground ยาวขึ้น
 
           // ถ้า ground ยาวเท่า gameWidth แล้ว
           if (this.ground.width >= this.gameWidth) {
+            console.log('stop')
             this.ground.width = this.gameWidth
-            this.player.setVelocityX(0) // Dino ค่อยหยุด
-            rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้
+            this.player.setVelocityX(0) // Dino ค่อยหยุดเดิน
+            rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้ (ถ้าไม่ใส่ = function นี้จะทำงานต่อเรื่อยๆ)
           }
         }
       })
