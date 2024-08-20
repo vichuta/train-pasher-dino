@@ -47,7 +47,14 @@ class PlayScene extends GameScene {
 
     // restart button
     this.restartText.on('pointerdown', () => {
-      console.log('Clicking restart!')
+      this.physics.resume()
+      this.player.setVelocityY(0)
+
+      this.obstacles.clear(true, true)
+      this.gameOverContainer.setAlpha(0)
+      this.anims.resumeAll()
+
+      this.isGameRunning = true
     })
 
     // ตรวจสถานะการชนของ obstacle กับ Dino
