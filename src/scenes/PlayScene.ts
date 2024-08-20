@@ -45,14 +45,18 @@ class PlayScene extends Phaser.Scene {
 
       this.startTrigger.body.reset(9999, 9999) //ทำให้ startTrigger หายไป
 
-      // ทำให้ ground ยาวขึ้น
-      this.time.addEvent({
+      const rollOutEvent = this.time.addEvent({
         delay: 1000 / 60,
         loop: true,
         callback: () => {
-          //ให้เพิ่มควายาวพื้นเรื่อยๆ จนกว่าจะยาวเท่ากับความกว้างของเกม จะค่อยหยุด
-          if (this.ground.width <= this.gameWidth) {
-            this.ground.width += 34
+          this.player.setVelocityX(80) // ทำให้ Dino เคลื่อนไปข้าวหน้านิดนึง
+          this.ground.width += 17 * 2 // ทำให้ ground ยาวขึ้น
+
+          // ถ้า ground ยาวเท่า gameWidth แล้ว
+          if (this.ground.width >= this.gameWidth) {
+            this.ground.width = this.gameWidth
+            this.player.setVelocityX(0) // Dino ค่อยหยุด
+            rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้
           }
         }
       })
