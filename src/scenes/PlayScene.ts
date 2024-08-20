@@ -27,98 +27,15 @@ class PlayScene extends GameScene {
   create() {
     this.createEnvironment() // add ground
     this.createPlayer() // add Dino
+    this.createObstacles()
+    this.createGameOver()
 
-    // startTrigger ใช้ตรวจจับ Dino กระโดด = เล่นเกม
-    this.startTrigger = this.physics.add
-      .sprite(0, 10, null)
-      .setAlpha(0)
-      .setOrigin(0, 1)
-
-    this.obstacles = this.physics.add.group()
-
-    // -- container : Game Over --
-    this.gameOverText = this.add.image(0, 0, 'game-over')
-    this.restartText = this.add.image(0, 80, 'restart').setInteractive()
-
-    this.gameOverContainer = this.add
-      .container(this.gameWidth / 2, this.gameHeight / 2 - 50)
-      .add([this.gameOverText, this.restartText])
-      .setAlpha(0)
-
-    // restart button
-    this.restartText.on('pointerdown', () => {
-      this.physics.resume()
-      this.player.setVelocityY(0)
-
-      this.obstacles.clear(true, true)
-      this.gameOverContainer.setAlpha(0)
-      this.anims.resumeAll()
-
-      this.isGameRunning = true
-    })
-
-    // ตรวจสถานะการชนของ obstacle กับ Dino
-    this.physics.add.collider(this.obstacles, this.player, () => {
-      // --> ถ้าชนให้หยุดเกม
-      this.isGameRunning = false
-      this.physics.pause()
-
-      // --> เปลี่ยนรูป Dino เป็นท่าตาย
-      this.player.die()
-      // --> show container Game Over
-      this.gameOverContainer.setAlpha(1)
-
-      // --> reset ค่า
-      this.spawnTime = 0
-      this.gameSpeed = 5
-    })
-
-    // ถ้า object startTrigger ทับกับ Dino ให้ทำ function ต่อไปนี้
-    this.physics.add.overlap(this.startTrigger, this.player, () => {
-      // ถ้าตำแหน่ง y ของ startTrigger = 10 --> ให้ ย้ายไปอยู่ขอบซ้ายล่าง .body.reset(0,y)
-      if (this.startTrigger.y === 10) {
-        this.startTrigger.body.reset(0, this.gameHeight)
-        console.log('Triggering upper Trigger!')
-        return
-      }
-
-      // startTrigger ไม่อยู่มุมบนขวาแล้ว ให้ function ต่อไปนี้
-
-      this.startTrigger.body.reset(9999, 9999) //ทำให้ startTrigger หายไป
-
-      const rollOutEvent = this.time.addEvent({
-        delay: 1000 / 60,
-        loop: true,
-        callback: () => {
-          console.log('rolling')
-          this.player.playRunAnimation()
-          this.player.setVelocityX(80) // ทำให้ Dino เคลื่อนไปข้าวหน้านิดนึง
-          this.ground.width += 17 * 2 // ทำให้ ground ยาวขึ้น
-
-          // ถ้า ground ยาวเท่า gameWidth แล้ว
-          if (this.ground.width >= this.gameWidth) {
-            console.log('stop')
-            this.ground.width = this.gameWidth
-            this.player.setVelocityX(0) // Dino ค่อยหยุดเดิน
-            rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้ (ถ้าไม่ใส่ = function นี้จะทำงานต่อเรื่อยๆ)
-            this.isGameRunning = true
-          }
-        }
-      })
-    })
+    this.handleGameStart()
+    this.handleObstacleCollisions()
+    this.handleGameRestart()
   }
 
   createPlayer() {
-    // add Dino by create sprite object
-    // this.player = this.physics.add
-    //   .sprite(0, this.gameHeight, 'dino-idle')
-    //   .setOrigin(0, 1)
-
-    // this.player
-    //   .setGravityY(5000)
-    //   .setCollideWorldBounds(true) //ชนขอบจอ
-    //   .setBodySize(44, 92) //fix hit-box dino
-
     //ย้าย setting ต่างๆ ไปที่ class Player
     this.player = new Player(this, 0, this.gameHeight)
   }
@@ -158,6 +75,20 @@ class PlayScene extends GameScene {
     this.ground.tilePositionX += this.gameSpeed
   }
 
+  createObstacles() {
+    this.obstacles = this.physics.add.group()
+  }
+  createGameOver() {
+    // -- container : Game Over --
+    this.gameOverText = this.add.image(0, 0, 'game-over')
+    this.restartText = this.add.image(0, 80, 'restart').setInteractive()
+
+    this.gameOverContainer = this.add
+      .container(this.gameWidth / 2, this.gameHeight / 2 - 50)
+      .add([this.gameOverText, this.restartText])
+      .setAlpha(0)
+  }
+
   spawnObstacle() {
     const obstacleNum =
       Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount) + 1
@@ -167,6 +98,77 @@ class PlayScene extends GameScene {
       .create(distance, this.gameHeight, `obstacle-${obstacleNum}`)
       .setOrigin(0, 1)
       .setImmovable()
+  }
+
+  handleGameStart() {
+    // startTrigger ใช้ตรวจจับ Dino กระโดด = เล่นเกม
+    this.startTrigger = this.physics.add
+      .sprite(0, 10, null)
+      .setAlpha(0)
+      .setOrigin(0, 1)
+
+    // ถ้า object startTrigger ทับกับ Dino ให้ทำ function ต่อไปนี้
+    this.physics.add.overlap(this.startTrigger, this.player, () => {
+      // ถ้าตำแหน่ง y ของ startTrigger = 10 --> ให้ ย้ายไปอยู่ขอบซ้ายล่าง .body.reset(0,y)
+      if (this.startTrigger.y === 10) {
+        this.startTrigger.body.reset(0, this.gameHeight)
+        console.log('Triggering upper Trigger!')
+        return
+      }
+
+      // -- startTrigger ไม่อยู่มุมบนขวาแล้ว ให้ function ต่อไปนี้ --
+      this.startTrigger.body.reset(9999, 9999) //ทำให้ startTrigger หายไป
+
+      const rollOutEvent = this.time.addEvent({
+        delay: 1000 / 60,
+        loop: true,
+        callback: () => {
+          console.log('rolling')
+          this.player.playRunAnimation()
+          this.player.setVelocityX(80) // ทำให้ Dino เคลื่อนไปข้าวหน้านิดนึง
+          this.ground.width += 17 * 2 // ทำให้ ground ยาวขึ้น
+
+          // ถ้า ground ยาวเท่า gameWidth แล้ว
+          if (this.ground.width >= this.gameWidth) {
+            console.log('stop')
+            this.ground.width = this.gameWidth
+            this.player.setVelocityX(0) // Dino ค่อยหยุดเดิน
+            rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้ (ถ้าไม่ใส่ = function นี้จะทำงานต่อเรื่อยๆ)
+            this.isGameRunning = true
+          }
+        }
+      })
+    })
+  }
+  handleObstacleCollisions() {
+    // ตรวจสถานะการชนของ obstacle กับ Dino
+    this.physics.add.collider(this.obstacles, this.player, () => {
+      // --> ถ้าชนให้หยุดเกม
+      this.isGameRunning = false
+      this.physics.pause()
+
+      // --> เปลี่ยนรูป Dino เป็นท่าตาย
+      this.player.die()
+      // --> show container Game Over
+      this.gameOverContainer.setAlpha(1)
+
+      // --> reset ค่า
+      this.spawnTime = 0
+      this.gameSpeed = 5
+    })
+  }
+  handleGameRestart() {
+    // restart button
+    this.restartText.on('pointerdown', () => {
+      this.physics.resume()
+      this.player.setVelocityY(0)
+
+      this.obstacles.clear(true, true)
+      this.gameOverContainer.setAlpha(0)
+      this.anims.resumeAll()
+
+      this.isGameRunning = true
+    })
   }
 }
 
