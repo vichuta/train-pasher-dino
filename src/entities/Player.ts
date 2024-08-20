@@ -1,7 +1,11 @@
+import { GameScene } from '../scenes/GameScene'
+
 export class Player extends Phaser.Physics.Arcade.Sprite {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys // CursorKeys เป็น type Object ที่เก็บ keyborad ขึ้น-ลง-ซ้าย-ขวา-spacebar
-  constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'dino-idle')
+  scene: GameScene
+
+  constructor(scene: GameScene, x: number, y: number) {
 
     scene.add.existing(this)
     scene.physics.add.existing(this)
@@ -46,7 +50,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityY(-1600)
     }
 
-    if (!(this.scene as any).isGameRunning) {
+    // if (!(this.scene as any).isGameRunning) {
+    //   return
+    // }
+    if (!this.scene.isGameRunning) {
       return
     }
 

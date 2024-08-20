@@ -1,23 +1,24 @@
 import Phaser from 'phaser'
 import { Player } from '../entities/Player'
 import { SpriteWithDynamicBody } from '../types'
+import { GameScene } from './GameScene'
 
-class PlayScene extends Phaser.Scene {
+class PlayScene extends GameScene {
   // player: SpriteWithDynamicBody เปลี่ยน Type เป็น Player
   player: Player
   ground: Phaser.GameObjects.TileSprite
   startTrigger: SpriteWithDynamicBody
-  isGameRunning: boolean = false
+  // isGameRunning: boolean = false
 
-  // get ค่าความสูงของเกม
-  get gameHeight() {
-    return this.game.config.height as number
-  }
+  // // get ค่าความสูงของเกม
+  // get gameHeight() {
+  //   return this.game.config.height as number
+  // }
 
-  // get ค่าความกว้างของเกม
-  get gameWidth() {
-    return this.game.config.width as number
-  }
+  // // get ค่าความกว้างของเกม
+  // get gameWidth() {
+  //   return this.game.config.width as number
+  // }
 
   constructor() {
     super('PlayScene')
