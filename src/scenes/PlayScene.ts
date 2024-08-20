@@ -14,6 +14,7 @@ class PlayScene extends GameScene {
 
   gameOverText: Phaser.GameObjects.Image
   restartText: Phaser.GameObjects.Image
+  gameOverContainer: Phaser.GameObjects.Container
 
   spawnInterval: number = 1500
   spawnTime: number = 0
@@ -38,9 +39,10 @@ class PlayScene extends GameScene {
     this.gameOverText = this.add.image(0, 0, 'game-over')
     this.restartText = this.add.image(0, 80, 'restart')
 
-    this.add
+    this.gameOverContainer = this.add
       .container(this.gameWidth / 2, this.gameHeight / 2 - 50)
       .add([this.gameOverText, this.restartText])
+      .setAlpha(0)
 
     // ตรวจสถานะการชนของ obstacle กับ Dino
     this.physics.add.collider(this.obstacles, this.player, () => {
@@ -50,6 +52,8 @@ class PlayScene extends GameScene {
 
       // --> เปลี่ยนรูป Dino เป็นท่าตาย
       this.player.die()
+      // --> show container Game Over
+      this.gameOverContainer.setAlpha(1)
 
       // --> reset ค่า
       this.spawnTime = 0
