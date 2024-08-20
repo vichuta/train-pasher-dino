@@ -1,22 +1,24 @@
 import Phaser from 'phaser'
+import { PRELOAD_CONFIG } from '..'
 import { Player } from '../entities/Player'
 import { SpriteWithDynamicBody } from '../types'
+import { GameScene } from './GameScene'
 
-class PlayScene extends Phaser.Scene {
+class PlayScene extends GameScene {
+  // --- กำหนด Type ตัวแปร ---
   // player: SpriteWithDynamicBody เปลี่ยน Type เป็น Player
   player: Player
   ground: Phaser.GameObjects.TileSprite
+  obstacles: Phaser.Physics.Arcade.Group
   startTrigger: SpriteWithDynamicBody
 
-  // get ค่าความสูงของเกม
-  get gameHeight() {
-    return this.game.config.height as number
-  }
+  gameOverText: Phaser.GameObjects.Image
+  restartText: Phaser.GameObjects.Image
+  gameOverContainer: Phaser.GameObjects.Container
 
-  // get ค่าความกว้างของเกม
-  get gameWidth() {
-    return this.game.config.width as number
-  }
+  spawnInterval: number = 1500
+  spawnTime: number = 0
+  gameSpeed: number = 5
 
   constructor() {
     super('PlayScene')
@@ -32,6 +34,45 @@ class PlayScene extends Phaser.Scene {
       .setAlpha(0)
       .setOrigin(0, 1)
 
+    this.obstacles = this.physics.add.group()
+
+    // -- container : Game Over --
+    this.gameOverText = this.add.image(0, 0, 'game-over')
+    this.restartText = this.add.image(0, 80, 'restart').setInteractive()
+
+    this.gameOverContainer = this.add
+      .container(this.gameWidth / 2, this.gameHeight / 2 - 50)
+      .add([this.gameOverText, this.restartText])
+      .setAlpha(0)
+
+    // restart button
+    this.restartText.on('pointerdown', () => {
+      this.physics.resume()
+      this.player.setVelocityY(0)
+
+      this.obstacles.clear(true, true)
+      this.gameOverContainer.setAlpha(0)
+      this.anims.resumeAll()
+
+      this.isGameRunning = true
+    })
+
+    // ตรวจสถานะการชนของ obstacle กับ Dino
+    this.physics.add.collider(this.obstacles, this.player, () => {
+      // --> ถ้าชนให้หยุดเกม
+      this.isGameRunning = false
+      this.physics.pause()
+
+      // --> เปลี่ยนรูป Dino เป็นท่าตาย
+      this.player.die()
+      // --> show container Game Over
+      this.gameOverContainer.setAlpha(1)
+
+      // --> reset ค่า
+      this.spawnTime = 0
+      this.gameSpeed = 5
+    })
+
     // ถ้า object startTrigger ทับกับ Dino ให้ทำ function ต่อไปนี้
     this.physics.add.overlap(this.startTrigger, this.player, () => {
       // ถ้าตำแหน่ง y ของ startTrigger = 10 --> ให้ ย้ายไปอยู่ขอบซ้ายล่าง .body.reset(0,y)
@@ -45,14 +86,22 @@ class PlayScene extends Phaser.Scene {
 
       this.startTrigger.body.reset(9999, 9999) //ทำให้ startTrigger หายไป
 
-      // ทำให้ ground ยาวขึ้น
-      this.time.addEvent({
+      const rollOutEvent = this.time.addEvent({
         delay: 1000 / 60,
         loop: true,
         callback: () => {
-          //ให้เพิ่มควายาวพื้นเรื่อยๆ จนกว่าจะยาวเท่ากับความกว้างของเกม จะค่อยหยุด
-          if (this.ground.width <= this.gameWidth) {
-            this.ground.width += 34
+          console.log('rolling')
+          this.player.playRunAnimation()
+          this.player.setVelocityX(80) // ทำให้ Dino เคลื่อนไปข้าวหน้านิดนึง
+          this.ground.width += 17 * 2 // ทำให้ ground ยาวขึ้น
+
+          // ถ้า ground ยาวเท่า gameWidth แล้ว
+          if (this.ground.width >= this.gameWidth) {
+            console.log('stop')
+            this.ground.width = this.gameWidth
+            this.player.setVelocityX(0) // Dino ค่อยหยุดเดิน
+            rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้ (ถ้าไม่ใส่ = function นี้จะทำงานต่อเรื่อยๆ)
+            this.isGameRunning = true
           }
         }
       })
@@ -81,7 +130,44 @@ class PlayScene extends Phaser.Scene {
       .setOrigin(0, 1)
   }
 
-  update(time: number, delta: number): void {}
+  update(time: number, delta: number): void {
+    //ถ้าเกมยังไม่เริ่ม อย่าพึ่งทำอะไร
+    if (!this.isGameRunning) {
+      return
+    }
+
+    //ถ้าเกมเริ่มแล้ว ให้ทำ function ต่อไปนี้
+    this.spawnTime += delta
+
+    if (this.spawnTime >= this.spawnInterval) {
+      this.spawnObstacle()
+      this.spawnTime = 0
+    }
+
+    // เพิ่ม action ในเพิ่ม/ลดการเคลื่อนที่ในแนวแกน x
+    Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
+
+    // ถ้า obstacle ไหนวิ่งเลยจน x ติดลบ (วิ่งเลยขอบ) แล้ว --> ลบ objeect ทิ้ง
+    this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody) => {
+      if (obstacle.getBounds().right < 0) {
+        this.obstacles.remove(obstacle)
+      }
+    })
+
+    // ทำให้พื้นวิ่งตาม obstacle (ใช้ความเร็วแกน x เท่ากัน)
+    this.ground.tilePositionX += this.gameSpeed
+  }
+
+  spawnObstacle() {
+    const obstacleNum =
+      Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount) + 1
+    const distance = Phaser.Math.Between(600, 900)
+
+    this.obstacles
+      .create(distance, this.gameHeight, `obstacle-${obstacleNum}`)
+      .setOrigin(0, 1)
+      .setImmovable()
+  }
 }
 
 export default PlayScene
