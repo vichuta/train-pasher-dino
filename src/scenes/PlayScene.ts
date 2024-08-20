@@ -11,6 +11,10 @@ class PlayScene extends GameScene {
   ground: Phaser.GameObjects.TileSprite
   obstacles: Phaser.Physics.Arcade.Group
   startTrigger: SpriteWithDynamicBody
+
+  gameOverText: Phaser.GameObjects.Image
+  restartText: Phaser.GameObjects.Image
+
   spawnInterval: number = 1500
   spawnTime: number = 0
   gameSpeed: number = 5
@@ -30,6 +34,13 @@ class PlayScene extends GameScene {
       .setOrigin(0, 1)
 
     this.obstacles = this.physics.add.group()
+
+    this.gameOverText = this.add.image(0, 0, 'game-over')
+    this.restartText = this.add.image(0, 80, 'restart')
+
+    this.add
+      .container(this.gameWidth / 2, this.gameHeight / 2 - 50)
+      .add([this.gameOverText, this.restartText])
 
     // ตรวจสถานะการชนของ obstacle กับ Dino
     this.physics.add.collider(this.obstacles, this.player, () => {
