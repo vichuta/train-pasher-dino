@@ -35,20 +35,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const { space } = this.cursors
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space)
 
-    const onFloor = (this.body as Phaser.Physics.Arcade.Body).onFloor()
-    console.log(onFloor)
+    const onFloor = (this.body as Phaser.Physics.Arcade.Body).onFloor() //เช็คว่า Player ยืนบนพื้นไหม
+    // console.log(onFloor)
 
-    //ถ้าปุ่ม spacebar ถูกกดอยู่ / กด spacebar ค้าง = โดดดดดดดดดดดดดดดดด ลอยเลย
+    // space.isDown = ถ้าปุ่ม spacebar ถูกกดอยู่ / กด spacebar ค้าง = โดดดดดดดดด ลอยเลย
+    // isSpaceJustDown = ถ้าปุ่ม spacebar ถูกกดแล้ว = กระโดด (กดค้างไม่ลอย)
     if (isSpaceJustDown) {
       this.setVelocityY(-1600)
     }
-
-    //  const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space)
-
-    //  const onFloor = (this.body as Phaser.Physics.Arcade.Body).onFloor()
-
-    //  if (isSpaceJustDown && onFloor) {
-    //    this.setVelocityY(-1600)
-    //  }
   }
 }

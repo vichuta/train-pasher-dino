@@ -26,8 +26,16 @@ class PlayScene extends Phaser.Scene {
       .setAlpha(0)
       .setOrigin(0, 1)
 
+    // ถ้า object startTrigger ทับกับ Dino ให้ทำ function ต่อไปนี้
     this.physics.add.overlap(this.startTrigger, this.player, () => {
-      console.log('COLISION!')
+      // ถ้าตำแหน่ง y ของ startTrigger = 10 --> ให้ ย้ายไปอยู่ขอบซ้ายล่าง .body.reset(0,y)
+      if (this.startTrigger.y === 10) {
+        this.startTrigger.body.reset(0, this.gameHeight)
+        console.log('Triggering upper Trigger!')
+        return
+      }
+
+      this.startTrigger.body.reset(9999, 9999) //ทำให้ startTrigger หายไป
     })
   }
 
