@@ -13,6 +13,7 @@ class PlayScene extends GameScene {
   startTrigger: SpriteWithDynamicBody
   spawnInterval: number = 1500
   spawnTime: number = 0
+  obstacleSpeed: number = 10
 
   constructor() {
     super('PlayScene')
@@ -87,12 +88,21 @@ class PlayScene extends GameScene {
   }
 
   update(time: number, delta: number): void {
+    //ถ้าเกมยังไม่เริ่ม อย่าพึ่งทำอะไร
+    if (!this.isGameRunning) {
+      return
+    }
+
+    //ถ้าเกมเริ่มแล้ว ให้ทำ function ต่อไปนี้
     this.spawnTime += delta
 
     if (this.spawnTime >= this.spawnInterval) {
       this.spawnObstacle()
       this.spawnTime = 0
     }
+
+    // เพิ่ม action ในเพิ่ม/ลดการเคลื่อนที่ในแนวแกน x
+    Phaser.Actions.IncX(this.obstacles.getChildren(), -this.obstacleSpeed)
   }
 
   spawnObstacle() {
