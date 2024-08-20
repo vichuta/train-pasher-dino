@@ -36,13 +36,19 @@ class PlayScene extends GameScene {
 
     this.obstacles = this.physics.add.group()
 
+    // -- container : Game Over --
     this.gameOverText = this.add.image(0, 0, 'game-over')
-    this.restartText = this.add.image(0, 80, 'restart')
+    this.restartText = this.add.image(0, 80, 'restart').setInteractive()
 
     this.gameOverContainer = this.add
       .container(this.gameWidth / 2, this.gameHeight / 2 - 50)
       .add([this.gameOverText, this.restartText])
       .setAlpha(0)
+
+    // restart button
+    this.restartText.on('pointerdown', () => {
+      console.log('Clicking restart!')
+    })
 
     // ตรวจสถานะการชนของ obstacle กับ Dino
     this.physics.add.collider(this.obstacles, this.player, () => {
