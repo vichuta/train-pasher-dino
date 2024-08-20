@@ -90,14 +90,32 @@ class PlayScene extends GameScene {
   }
 
   spawnObstacle() {
-    const obstacleNum =
-      Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount) + 1
+    // สุ่มตัวเอง 1-7 (ใส่ค่า default ไว้ที่ index.ts)
+    const obstaclesCount =
+      PRELOAD_CONFIG.cactusesCount + PRELOAD_CONFIG.birdsCount
+    const obstacleNum = Math.floor(Math.random() * obstaclesCount) + 1
+
+    // สุ่มค่า x ระยะห่างในการ spawn obstacle
     const distance = Phaser.Math.Between(600, 900)
 
-    this.obstacles
-      .create(distance, this.gameHeight, `obstacle-${obstacleNum}`)
-      .setOrigin(0, 1)
-      .setImmovable()
+    let obstacle
+
+    // ถ้าสุ่มได้เลข 7 ให้เป็น enemy-bird แต่ถ้าไม่เป็น obstacle (กระบองเพชร)
+    if (obstacleNum > PRELOAD_CONFIG.cactusesCount) {
+      // enemy-bird --> สุ่มค่า y เพื่อ spawn ในระยะความสูงที่แตกต่างกัน
+      const enemyPossibleHeight = [20, 70]
+      const enemyHeight = enemyPossibleHeight[Math.floor(Math.random() * 2)] // สุ่ม index เพื่อเลือกค่าใน enemyPossibleHeight array
+      obstacle = this.obstacles
+        .create(distance, this.gameHeight - enemyHeight, 'enemy-bird')
+        .setOrigin(0, 1)
+        .setImmovable()
+    } else {
+      // obstacle (กระบองเพชร)
+      obstacle = this.obstacles
+        .create(distance, this.gameHeight, `obstacle-${obstacleNum}`)
+        .setOrigin(0, 1)
+        .setImmovable()
+    }
   }
 
   handleGameStart() {
