@@ -7,6 +7,7 @@ class PlayScene extends Phaser.Scene {
   player: Player
   ground: Phaser.GameObjects.TileSprite
   startTrigger: SpriteWithDynamicBody
+  isGameRunning: boolean = false
 
   // get ค่าความสูงของเกม
   get gameHeight() {
@@ -60,6 +61,7 @@ class PlayScene extends Phaser.Scene {
             this.ground.width = this.gameWidth
             this.player.setVelocityX(0) // Dino ค่อยหยุดเดิน
             rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้ (ถ้าไม่ใส่ = function นี้จะทำงานต่อเรื่อยๆ)
+            this.isGameRunning = true
           }
         }
       })
