@@ -92,6 +92,7 @@ class PlayScene extends GameScene {
   }
 
   createAnimations() {
+    //สร้าง animation ท่านก บิน
     this.anims.create({
       key: 'enemy-bird-fly',
       frames: this.anims.generateFrameNumbers('enemy-bird'),
@@ -108,7 +109,7 @@ class PlayScene extends GameScene {
     const obstacleNum = 7 // สำหรับ test  enemy-bird
 
     // สุ่มค่า x ระยะห่างในการ spawn obstacle
-    const distance = Phaser.Math.Between(600, 900)
+    const distance = Phaser.Math.Between(150, 300)
 
     let obstacle
 
@@ -118,15 +119,24 @@ class PlayScene extends GameScene {
       const enemyPossibleHeight = [20, 70]
       const enemyHeight = enemyPossibleHeight[Math.floor(Math.random() * 2)] // สุ่ม index เพื่อเลือกค่าใน enemyPossibleHeight array
       obstacle = this.obstacles
-        .create(distance, this.gameHeight - enemyHeight, 'enemy-bird')
+        .create(
+          this.gameWidth + distance,
+          this.gameHeight - enemyHeight,
+          'enemy-bird'
+        )
         .setOrigin(0, 1)
         .setImmovable()
+        .setBodySize(90, 40)
 
       obstacle.play('enemy-bird-fly', true)
     } else {
       // obstacle (กระบองเพชร)
       obstacle = this.obstacles
-        .create(distance, this.gameHeight, `obstacle-${obstacleNum}`)
+        .create(
+          this.gameWidth + distance,
+          this.gameHeight,
+          `obstacle-${obstacleNum}`
+        )
         .setOrigin(0, 1)
         .setImmovable()
     }

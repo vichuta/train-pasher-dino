@@ -22,8 +22,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0, 1)
       .setGravityY(5000)
       .setCollideWorldBounds(true)
-      .setBodySize(44, 92)
+      .setBodySize(38, 92)
       .setOffset(20, 0)
+      .setDepth(1) // z-index
 
     this.registerAnimations()
   }
