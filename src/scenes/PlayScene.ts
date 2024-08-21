@@ -105,8 +105,8 @@ class PlayScene extends GameScene {
     // สุ่มตัวเอง 1-7 (ใส่ค่า default ไว้ที่ index.ts)
     const obstaclesCount =
       PRELOAD_CONFIG.cactusesCount + PRELOAD_CONFIG.birdsCount
-    // const obstacleNum = Math.floor(Math.random() * obstaclesCount) + 1
-    const obstacleNum = 7 // สำหรับ test  enemy-bird
+    const obstacleNum = Math.floor(Math.random() * obstaclesCount) + 1
+    // const obstacleNum = 7 // สำหรับ test  enemy-bird
 
     // สุ่มค่า x ระยะห่างในการ spawn obstacle
     const distance = Phaser.Math.Between(150, 300)
