@@ -11,6 +11,7 @@ class PlayScene extends GameScene {
   ground: Phaser.GameObjects.TileSprite
   obstacles: Phaser.Physics.Arcade.Group
   startTrigger: SpriteWithDynamicBody
+  clouds: Phaser.GameObjects.Group
 
   gameOverText: Phaser.GameObjects.Image
   restartText: Phaser.GameObjects.Image
@@ -47,6 +48,16 @@ class PlayScene extends GameScene {
     this.ground = this.add
       .tileSprite(0, this.gameHeight as number, 88, 26, 'ground')
       .setOrigin(0, 1)
+
+    // add clouds
+    this.clouds = this.add.group()
+    this.clouds = this.clouds.addMultiple([
+      this.add.image(this.gameWidth / 2, 170, 'cloud'),
+      this.add.image(this.gameWidth - 80, 80, 'cloud'),
+      this.add.image(this.gameWidth / 1.3, 100, 'cloud')
+    ])
+
+    this.clouds.setAlpha(0) //ซ่อน cloud ไว้ก่อน จะเริ่มเกม
   }
 
   update(time: number, delta: number): void {
@@ -65,11 +76,17 @@ class PlayScene extends GameScene {
 
     // เพิ่ม action ในเพิ่ม/ลดการเคลื่อนที่ในแนวแกน x
     Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
+    Phaser.Actions.IncX(this.clouds.getChildren(), -0.5)
 
     // ถ้า obstacle ไหนวิ่งเลยจน x ติดลบ (วิ่งเลยขอบ) แล้ว --> ลบ objeect ทิ้ง
     this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody) => {
       if (obstacle.getBounds().right < 0) {
         this.obstacles.remove(obstacle)
+      }
+    })
+    this.clouds.getChildren().forEach((cloud: SpriteWithDynamicBody) => {
+      if (cloud.getBounds().right < 0) {
+        cloud.x = this.gameWidth + 30
       }
     })
 
@@ -176,6 +193,7 @@ class PlayScene extends GameScene {
             this.ground.width = this.gameWidth
             this.player.setVelocityX(0) // Dino ค่อยหยุดเดิน
             rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้ (ถ้าไม่ใส่ = function นี้จะทำงานต่อเรื่อยๆ)
+            this.clouds.setAlpha(1) // show clouds
             this.isGameRunning = true
           }
         }
