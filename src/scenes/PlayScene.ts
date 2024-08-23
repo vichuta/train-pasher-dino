@@ -25,6 +25,7 @@ class PlayScene extends GameScene {
   spawnInterval: number = 1500
   spawnTime: number = 0
   gameSpeed: number = 5
+  gameSpeedModifier: number = 1
 
   constructor() {
     super('PlayScene')
@@ -88,10 +89,15 @@ class PlayScene extends GameScene {
     this.spawnTime += delta
     this.scoreDeltaTime += delta
 
+    //เพิ่ม score ตามระยะเวลาที่เล่นได้เกม
     if (this.scoreDeltaTime >= this.scoreInterval) {
       this.score++
-      console.log(this.score)
       this.scoreDeltaTime = 0
+
+      if (this.score % 100 === 0) {
+        // ถ้า score ถึง 100 แล้วเพิ่มความเร็ว
+        this.gameSpeedModifier += 0.2
+      }
     }
 
     if (this.spawnTime >= this.spawnInterval) {
@@ -100,7 +106,11 @@ class PlayScene extends GameScene {
     }
 
     // เพิ่ม action ในเพิ่ม/ลดการเคลื่อนที่ในแนวแกน x
-    Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
+    // Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
+    Phaser.Actions.IncX(
+      this.obstacles.getChildren(),
+      -this.gameSpeed * this.gameSpeedModifier
+    ) // เพิ่มความเร็วของเกมให้ยากขึ้น
     Phaser.Actions.IncX(this.clouds.getChildren(), -0.5)
 
     // --- เอาแต้ม score ไปแสดง ---
@@ -123,7 +133,8 @@ class PlayScene extends GameScene {
     })
 
     // ทำให้พื้นวิ่งตาม obstacle (ใช้ความเร็วแกน x เท่ากัน)
-    this.ground.tilePositionX += this.gameSpeed
+    // this.ground.tilePositionX += this.gameSpeed
+    this.ground.tilePositionX += this.gameSpeed * this.gameSpeedModifier
   }
 
   createObstacles() {
@@ -250,7 +261,7 @@ class PlayScene extends GameScene {
       this.spawnTime = 0
       this.score = 0
       this.scoreDeltaTime = 0
-      this.gameSpeed = 5
+      this.gameSpeedModifier = 1
     })
   }
   handleGameRestart() {
