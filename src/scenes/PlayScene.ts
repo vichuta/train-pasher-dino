@@ -28,6 +28,8 @@ class PlayScene extends GameScene {
   gameSpeed: number = 5
   gameSpeedModifier: number = 1
 
+  progressSound: Phaser.Sound.HTML5AudioSound
+
   constructor() {
     super('PlayScene')
   }
@@ -42,6 +44,10 @@ class PlayScene extends GameScene {
     this.handleGameStart()
     this.handleObstacleCollisions()
     this.handleGameRestart()
+
+    this.progressSound = this.sound.add('progress', {
+      volume: 0.2
+    }) as Phaser.Sound.HTML5AudioSound
 
     this.createAnimations()
   }
@@ -109,6 +115,8 @@ class PlayScene extends GameScene {
         // ถ้า score ถึง 100 แล้วเพิ่มความเร็ว
         this.gameSpeedModifier += 0.2
 
+        this.progressSound.play()
+
         // ทำให้ score กระพริบ
         this.tweens.add({
           targets: this.scoreText,
@@ -156,6 +164,7 @@ class PlayScene extends GameScene {
     // this.ground.tilePositionX += this.gameSpeed
     this.ground.tilePositionX += this.gameSpeed * this.gameSpeedModifier
   }
+  
 
   createObstacles() {
     this.obstacles = this.physics.add.group()

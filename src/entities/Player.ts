@@ -4,6 +4,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys // CursorKeys เป็น type Object ที่เก็บ keyborad ขึ้น-ลง-ซ้าย-ขวา-spacebar
   scene: GameScene
   jumpSound: Phaser.Sound.HTML5AudioSound
+  hitSound: Phaser.Sound.HTML5AudioSound
 
   constructor(scene: GameScene, x: number, y: number) {
     super(scene, x, y, 'dino-run')
@@ -29,9 +30,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.registerAnimations()
 
-    this.jumpSound = this.scene.sound.add('jump', {
-      volume: 0.2
-    }) as Phaser.Sound.HTML5AudioSound
+    this.registerSounds()
   }
 
   // registerPlayerControl() {
@@ -85,6 +84,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
+  registerSounds() {
+    this.jumpSound = this.scene.sound.add('jump', {
+      volume: 0.2
+    }) as Phaser.Sound.HTML5AudioSound
+    this.hitSound = this.scene.sound.add('hit', {
+      volume: 1
+    }) as Phaser.Sound.HTML5AudioSound
+  }
+
   playRunAnimation() {
     //ถ้าความสูงน้อยกว่า 58 ให้ทำท่าก้ม
     this.body.height <= 58
@@ -113,5 +121,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   die() {
     this.anims.pause() //หยุดย่ำท้า
     this.setTexture('dino-hurt') // เปลี่ยนเป็นรูป Dino ท่าตาย
+    this.hitSound.play()
   }
 }
