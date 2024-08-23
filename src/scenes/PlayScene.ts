@@ -13,6 +13,7 @@ class PlayScene extends GameScene {
   startTrigger: SpriteWithDynamicBody
   clouds: Phaser.GameObjects.Group
 
+  highScoreText: Phaser.GameObjects.Text
   scoreText: Phaser.GameObjects.Text
   gameOverText: Phaser.GameObjects.Image
   restartText: Phaser.GameObjects.Image
@@ -77,6 +78,16 @@ class PlayScene extends GameScene {
       })
       .setOrigin(1, 0)
       .setAlpha(0)
+
+    this.highScoreText = this.add
+      .text(this.scoreText.getBounds().left - 20, 0, '00000', {
+        fontSize: 30,
+        fontFamily: 'Arial',
+        color: '#535353',
+        resolution: 5
+      })
+      .setOrigin(1, 0)
+      .setAlpha(0)
   }
 
   update(time: number, delta: number): void {
@@ -97,6 +108,15 @@ class PlayScene extends GameScene {
       if (this.score % 100 === 0) {
         // ถ้า score ถึง 100 แล้วเพิ่มความเร็ว
         this.gameSpeedModifier += 0.2
+
+        // ทำให้ score กระพริบ
+        this.tweens.add({
+          targets: this.scoreText,
+          duration: 100,
+          repeat: 3,
+          alpha: 0,
+          yoyo: true
+        })
       }
     }
 
@@ -256,6 +276,18 @@ class PlayScene extends GameScene {
       this.player.die()
       // --> show container Game Over
       this.gameOverContainer.setAlpha(1)
+
+      // -- บันทึกค่า high score ---
+      const newHighScore = this.highScoreText.text.substring(
+        this.highScoreText.text.length - 5
+      )
+      const newScore =
+        Number(this.scoreText.text) > Number(newHighScore)
+          ? this.scoreText.text
+          : newHighScore
+
+      this.highScoreText.setText('HI ' + newScore)
+      this.highScoreText.setAlpha(1)
 
       // --> reset ค่า
       this.spawnTime = 0
