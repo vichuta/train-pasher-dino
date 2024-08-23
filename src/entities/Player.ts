@@ -22,7 +22,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0, 1)
       .setGravityY(5000)
       .setCollideWorldBounds(true)
-      .setBodySize(44, 92)
+      .setBodySize(38, 92)
+      .setOffset(20, 0)
+      .setDepth(1) // z-index
 
     this.registerAnimations()
   }
@@ -38,18 +40,30 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   //   })
   // }
   update() {
-    const { space } = this.cursors
+    const { space, down } = this.cursors
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space)
+    const isDownJustDown = Phaser.Input.Keyboard.JustDown(down)
+    const isDownJustUp = Phaser.Input.Keyboard.JustUp(down)
 
     const onFloor = (this.body as Phaser.Physics.Arcade.Body).onFloor() //เช็คว่า Player ยืนบนพื้นไหม
     // console.log(onFloor)
 
     // space.isDown = ถ้าปุ่ม spacebar ถูกกดอยู่ / กด spacebar ค้าง = โดดดดดดดดด ลอยเลย
     // isSpaceJustDown = ถ้าปุ่ม spacebar ถูกกดแล้ว = กระโดด (กดค้างไม่ลอย)
-    if (isSpaceJustDown) {
+    // เพิ่ม && onFloor ทำให้กระโดดกลางอากาศไม่ได้
+    if (isSpaceJustDown && onFloor) {
       this.setVelocityY(-1600)
     }
 
+    // -- ถ้ากดปุ่ม down ขยับ hit-box ให้ต่ำลง แต่ไม่ได้กดปุ่มให้กลับมาตำแหน่งเดิม --
+    if (isDownJustDown && onFloor) {
+      this.body.setSize(this.body.width, 58)
+      this.setOffset(60, 34)
+    }
+    if (isDownJustUp && onFloor) {
+      this.body.setSize(44, 92)
+      this.setOffset(20, 0)
+    }
     // if (!(this.scene as any).isGameRunning) {
     //   return
     // }
@@ -66,13 +80,25 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   playRunAnimation() {
-    this.play('dino-run', true)
+    //ถ้าความสูงน้อยกว่า 58 ให้ทำท่าก้ม
+    this.body.height <= 58
+      ? this.play('dino-down', true)
+      : this.play('dino-run', true)
   }
 
   registerAnimations() {
+    //animation ท่าย้ำเท้า
     this.anims.create({
       key: 'dino-run',
       frames: this.anims.generateFrameNames('dino-run', { start: 2, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    })
+
+    //animation ท่าก้ม + ย่ำเท้า
+    this.anims.create({
+      key: 'dino-down',
+      frames: this.anims.generateFrameNames('dino-down'),
       frameRate: 10,
       repeat: -1
     })
