@@ -13,6 +13,7 @@ class PlayScene extends GameScene {
   startTrigger: SpriteWithDynamicBody
   clouds: Phaser.GameObjects.Group
 
+  highScoreText: Phaser.GameObjects.Text
   scoreText: Phaser.GameObjects.Text
   gameOverText: Phaser.GameObjects.Image
   restartText: Phaser.GameObjects.Image
@@ -25,6 +26,9 @@ class PlayScene extends GameScene {
   spawnInterval: number = 1500
   spawnTime: number = 0
   gameSpeed: number = 5
+  gameSpeedModifier: number = 1
+
+  progressSound: Phaser.Sound.HTML5AudioSound
 
   constructor() {
     super('PlayScene')
@@ -40,6 +44,10 @@ class PlayScene extends GameScene {
     this.handleGameStart()
     this.handleObstacleCollisions()
     this.handleGameRestart()
+
+    this.progressSound = this.sound.add('progress', {
+      volume: 0.2
+    }) as Phaser.Sound.HTML5AudioSound
 
     this.createAnimations()
   }
@@ -76,6 +84,16 @@ class PlayScene extends GameScene {
       })
       .setOrigin(1, 0)
       .setAlpha(0)
+
+    this.highScoreText = this.add
+      .text(this.scoreText.getBounds().left - 20, 0, '00000', {
+        fontSize: 30,
+        fontFamily: 'Arial',
+        color: '#535353',
+        resolution: 5
+      })
+      .setOrigin(1, 0)
+      .setAlpha(0)
   }
 
   update(time: number, delta: number): void {
@@ -88,10 +106,26 @@ class PlayScene extends GameScene {
     this.spawnTime += delta
     this.scoreDeltaTime += delta
 
+    //เพิ่ม score ตามระยะเวลาที่เล่นได้เกม
     if (this.scoreDeltaTime >= this.scoreInterval) {
       this.score++
-      console.log(this.score)
       this.scoreDeltaTime = 0
+
+      if (this.score % 100 === 0) {
+        // ถ้า score ถึง 100 แล้วเพิ่มความเร็ว
+        this.gameSpeedModifier += 0.2
+
+        this.progressSound.play()
+
+        // ทำให้ score กระพริบ
+        this.tweens.add({
+          targets: this.scoreText,
+          duration: 100,
+          repeat: 3,
+          alpha: 0,
+          yoyo: true
+        })
+      }
     }
 
     if (this.spawnTime >= this.spawnInterval) {
@@ -100,7 +134,11 @@ class PlayScene extends GameScene {
     }
 
     // เพิ่ม action ในเพิ่ม/ลดการเคลื่อนที่ในแนวแกน x
-    Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
+    // Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
+    Phaser.Actions.IncX(
+      this.obstacles.getChildren(),
+      -this.gameSpeed * this.gameSpeedModifier
+    ) // เพิ่มความเร็วของเกมให้ยากขึ้น
     Phaser.Actions.IncX(this.clouds.getChildren(), -0.5)
 
     // --- เอาแต้ม score ไปแสดง ---
@@ -123,8 +161,10 @@ class PlayScene extends GameScene {
     })
 
     // ทำให้พื้นวิ่งตาม obstacle (ใช้ความเร็วแกน x เท่ากัน)
-    this.ground.tilePositionX += this.gameSpeed
+    // this.ground.tilePositionX += this.gameSpeed
+    this.ground.tilePositionX += this.gameSpeed * this.gameSpeedModifier
   }
+  
 
   createObstacles() {
     this.obstacles = this.physics.add.group()
@@ -246,11 +286,23 @@ class PlayScene extends GameScene {
       // --> show container Game Over
       this.gameOverContainer.setAlpha(1)
 
+      // -- บันทึกค่า high score ---
+      const newHighScore = this.highScoreText.text.substring(
+        this.highScoreText.text.length - 5
+      )
+      const newScore =
+        Number(this.scoreText.text) > Number(newHighScore)
+          ? this.scoreText.text
+          : newHighScore
+
+      this.highScoreText.setText('HI ' + newScore)
+      this.highScoreText.setAlpha(1)
+
       // --> reset ค่า
       this.spawnTime = 0
       this.score = 0
       this.scoreDeltaTime = 0
-      this.gameSpeed = 5
+      this.gameSpeedModifier = 1
     })
   }
   handleGameRestart() {
