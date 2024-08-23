@@ -3,6 +3,7 @@ import { GameScene } from '../scenes/GameScene'
 export class Player extends Phaser.Physics.Arcade.Sprite {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys // CursorKeys เป็น type Object ที่เก็บ keyborad ขึ้น-ลง-ซ้าย-ขวา-spacebar
   scene: GameScene
+  jumpSound: Phaser.Sound.HTML5AudioSound
 
   constructor(scene: GameScene, x: number, y: number) {
     super(scene, x, y, 'dino-run')
@@ -27,6 +28,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .setDepth(1) // z-index
 
     this.registerAnimations()
+
+    this.jumpSound = this.scene.sound.add('jump', {
+      volume: 0.2
+    }) as Phaser.Sound.HTML5AudioSound
   }
 
   // registerPlayerControl() {
@@ -53,6 +58,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // เพิ่ม && onFloor ทำให้กระโดดกลางอากาศไม่ได้
     if (isSpaceJustDown && onFloor) {
       this.setVelocityY(-1600)
+      this.jumpSound.play()
     }
 
     // -- ถ้ากดปุ่ม down ขยับ hit-box ให้ต่ำลง แต่ไม่ได้กดปุ่มให้กลับมาตำแหน่งเดิม --
