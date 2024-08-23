@@ -13,9 +13,14 @@ class PlayScene extends GameScene {
   startTrigger: SpriteWithDynamicBody
   clouds: Phaser.GameObjects.Group
 
+  scoreText: Phaser.GameObjects.Text
   gameOverText: Phaser.GameObjects.Image
   restartText: Phaser.GameObjects.Image
   gameOverContainer: Phaser.GameObjects.Container
+
+  score: number = 0
+  scoreInterval: number = 100
+  scoreDeltaTime: number = 0
 
   spawnInterval: number = 1500
   spawnTime: number = 0
@@ -30,6 +35,7 @@ class PlayScene extends GameScene {
     this.createPlayer() // add Dino
     this.createObstacles()
     this.createGameOver()
+    this.createScore()
 
     this.handleGameStart()
     this.handleObstacleCollisions()
@@ -60,6 +66,18 @@ class PlayScene extends GameScene {
     this.clouds.setAlpha(0) //ซ่อน cloud ไว้ก่อน จะเริ่มเกม
   }
 
+  createScore() {
+    this.scoreText = this.add
+      .text(this.gameWidth, 0, '00000', {
+        fontSize: 30,
+        fontFamily: 'Arial',
+        color: '#535353',
+        resolution: 5
+      })
+      .setOrigin(1, 0)
+      .setAlpha(0)
+  }
+
   update(time: number, delta: number): void {
     //ถ้าเกมยังไม่เริ่ม อย่าพึ่งทำอะไร
     if (!this.isGameRunning) {
@@ -68,6 +86,13 @@ class PlayScene extends GameScene {
 
     //ถ้าเกมเริ่มแล้ว ให้ทำ function ต่อไปนี้
     this.spawnTime += delta
+    this.scoreDeltaTime += delta
+
+    if (this.scoreDeltaTime >= this.scoreInterval) {
+      this.score++
+      console.log(this.score)
+      this.scoreDeltaTime = 0
+    }
 
     if (this.spawnTime >= this.spawnInterval) {
       this.spawnObstacle()
@@ -77,6 +102,13 @@ class PlayScene extends GameScene {
     // เพิ่ม action ในเพิ่ม/ลดการเคลื่อนที่ในแนวแกน x
     Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed)
     Phaser.Actions.IncX(this.clouds.getChildren(), -0.5)
+
+    // --- เอาแต้ม score ไปแสดง ---
+    const score = Array.from(String(this.score), Number)
+    for (let i = 0; i < 5 - String(this.score).length; i++) {
+      score.unshift(0)
+    }
+    this.scoreText.setText(score.join(''))
 
     // ถ้า obstacle ไหนวิ่งเลยจน x ติดลบ (วิ่งเลยขอบ) แล้ว --> ลบ objeect ทิ้ง
     this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody) => {
@@ -195,6 +227,7 @@ class PlayScene extends GameScene {
             rollOutEvent.remove() //ลบ function นี้ = หยุดทำฟังชั่นนี้ (ถ้าไม่ใส่ = function นี้จะทำงานต่อเรื่อยๆ)
             this.clouds.setAlpha(1) // show clouds
             this.isGameRunning = true
+            this.scoreText.setAlpha(1) // show score
           }
         }
       })
@@ -215,6 +248,8 @@ class PlayScene extends GameScene {
 
       // --> reset ค่า
       this.spawnTime = 0
+      this.score = 0
+      this.scoreDeltaTime = 0
       this.gameSpeed = 5
     })
   }
